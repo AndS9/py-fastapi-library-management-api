@@ -5,7 +5,10 @@ from sqlalchemy.orm import Session
 
 import crud
 import schemas
-from database import SessionLocal
+from db.database import SessionLocal, Base, engine
+
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -53,15 +56,17 @@ def get_books(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
 
 @app.get("/books/{author_id}", response_model=list[schemas.Book])
 def get_books_by_id(author_id: int, db: Session = Depends(get_db)):
-    books = crud.get_books_by_author_id(db, author_id)
-    if not books:
+
+    if not crud.get_author(db, author_id):
         raise HTTPException(status_code=404, detail="Author not found")
-    return books
+
+    return crud.get_books_by_author_id(db, author_id)
 
 
 @app.post("/books/", response_model=schemas.Book)
 def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
     author = crud.get_author(db, author_id=book.author_id)
+
     if not author:
         raise HTTPException(status_code=404, detail="Author not found")
 

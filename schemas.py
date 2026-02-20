@@ -2,13 +2,11 @@ from datetime import date
 
 from pydantic import BaseModel
 
-import models
-
 
 #Author_data_model___________________________________________________________________
 class AuthorBase(BaseModel):
     name: str
-    bio: str
+    bio: str | None
 
 
 class AuthorCreate(AuthorBase):
@@ -19,7 +17,7 @@ class Author(AuthorBase):
     id: int
 
     class Config:
-        from_attributes = True
+        model_config = {"from_attributes": True}
 
 
 #Book_data_model_______________________________________________________________________
@@ -27,7 +25,7 @@ class Author(AuthorBase):
 class BookBase(BaseModel):
     title: str
     summary: str
-    publication_date: date
+    publication_date: date | None
 
 class BookCreate(BookBase):
     author_id: int
@@ -38,4 +36,4 @@ class Book(BookBase):
     author: Author
 
     class Config:
-        from_attributes = True
+        model_config = {"from_attributes": True}

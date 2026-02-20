@@ -1,6 +1,7 @@
+import sqlalchemy
 from sqlalchemy.orm import Session
 
-import models
+from db import models
 import schemas
 
 
@@ -34,7 +35,13 @@ def get_author_by_name(db: Session, author_name: str):
 def create_author(db: Session, author: schemas.AuthorCreate):
     db_author = models.Author(name=author.name, bio=author.bio)
     db.add(db_author)
-    db.commit()
+
+    try:
+        db.commit()
+    except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.SQLAlchemyError):
+        db.rollback()
+        raise
+
     db.refresh(db_author)
     return db_author
 
@@ -58,6 +65,11 @@ def create_book(db: Session, book: schemas.BookCreate):
                           author_id=book.author_id)
 
     db.add(db_book)
-    db.commit()
+    try:
+        db.commit()
+    except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.SQLAlchemyError):
+        db.rollback()
+        raise
+
     db.refresh(db_book)
     return db_book
