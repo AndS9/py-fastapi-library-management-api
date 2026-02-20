@@ -3,6 +3,14 @@ from sqlalchemy.orm import relationship
 from database import Base
 
 
+class Author(Base):
+    __tablename__ = "authors"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    name = Column(String(64), nullable=False, unique=True)
+    bio = Column(String(512), nullable=True)
+
+
 class Book(Base):
     __tablename__ = "books"
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
@@ -10,12 +18,4 @@ class Book(Base):
     summary = Column(String(512), nullable=False)
     publication_date = Column(Date, nullable=True)
     author_id = Column(Integer, ForeignKey("authors.id"))
-
-
-class Author(Base):
-    __tablename__ = "authors"
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    name = Column(String(64), nullable=False, unique=True)
-    bio = Column(String(512), nullable=True)
-    Books = relationship(Book)
+    author = relationship(Author)
